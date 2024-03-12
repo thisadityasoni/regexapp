@@ -5,35 +5,79 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regex-Clone</title>
+    <link rel="stylesheet" href="/static/main.css">
 </head>
-<body bgcolor="#ADD8E6">
-    <center>
-    <h1 style="color: rgb(90, 17, 17)">Regex101.com Clone</h1>
-    <form action="" method="POST">
-        <label>Regular Expression</label>
-        <input type="text" name="in_1" placeholder="RegEX"><br><br>
-        <label>Test String</label>
-        <textarea rows="6" cols="30" name="in_2" placeholder="insert test string"></textarea><br><br>
-        <button>Submit</button>
-    </form>
-    <h2>
-        <p><br><br>
-            Regex:{{regex}}  <br><br>
-            Test String:{{string}}
-        </p>
-    </h2>
-        {% if match|length %}
-            <h2 style="color:#df6a6a">Match Found</h2>
-            <b>
-            Total no of matches in given string is:{{result}} <br><br>
-            match:{{match}} <br><br>
-
-            {% for i in range(result) %}
-                Match-{{i+1}}, Start index: {{match[i][0]}} and End index :{{match[i][1]}} <br>
-            {% endfor %}
+<body>
+    <div class="container">
+        <h1>Regex101.com Clone</h1>
+        <form action="" method="POST">
+            <label for="in_1">Regular Expression</label>
+            <input type="text" id="in_1" name="in_1" placeholder="Regular Expression"><br>
+            <label for="in_2">Test String</label>
+            <textarea id="in_2" rows="6" cols="30" name="in_2" placeholder="Insert Test String"></textarea><br>
+            <label for="inputEmail">Email</label>
+            <input type="text" id="inputEmail" placeholder="Email">
+            <button id="validateEmailBtn">Validate Email</button>
+            <button type="submit">Submit</button>
+        </form>
+        <h2>
+            <p>Regex: {{ regex }}</p>
+            <p>Test String: {{ string }}</p>
+        </h2>
+        {% if regex == "email" %}
+            {% if result %}
+                <div class="match-info">Valid Email Address</div>
+                <div class="match-details">
+                    <p>Total number of valid email addresses: {{ result }}</p>
+                    <p>Email Addresses:</p>
+                    <ul>
+                        {% for email in match %}
+                            <li>{{ email }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% else %}
+                <div class="match-info">Invalid Email Address</div>
+            {% endif %}
         {% else %}
-            <h2>Match Not Found</h2>
+            {% if match|length %}
+                <div class="match-info">Match Found</div>
+                <div class="match-details">
+                    <p>Total number of matches in the given string: {{ result }}</p>
+                    <p>Matches:</p>
+                    <ul>
+                        {% for i in range(result) %}
+                            <li>Match {{ i+1 }}, Start index: {{ match[i][0] }} and End index: {{ match[i][1] }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% else %}
+                <div class="match-info">Match Not Found</div>
+            {% endif %}
         {% endif %}
-            </b>
+    </div>
 </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#validateEmailBtn').click(function () {
+            var email = $('#inputEmail').val();
+            $.ajax({
+                url: '/validate-email',
+                type: 'POST',
+                data: {email: email},
+                success: function (response) {
+                    if (response.valid) {
+                        alert('Valid email address!');
+                    } else {
+                        alert('Invalid email address!');
+                    }
+                },
+                error: function () {
+                    alert('Error occurred while validating email address.');
+                }
+            });
+        });
+    });
+</script>
 </html>
